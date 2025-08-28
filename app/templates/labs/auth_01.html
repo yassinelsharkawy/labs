@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Lab 6: MFA Bypass via Legacy API{% endblock %}
+{% block content %}
+<h1>Lab 6: MFA Bypass via Legacy API</h1>
+
+<h2>Scenario</h2>
+<p>An application has a primary login flow that enforces multi-factor authentication for users who have MFA enabled. A legacy API login endpoint (<code>/api/v1/login</code>) was retained for backward compatibility. This legacy endpoint authenticates credentials but does not enforce the MFA requirement.</p>
+
+<h2>Objective</h2>
+<p>Authenticate as an MFA-enabled user (grace / grace123) through the legacy API endpoint, bypassing MFA verification entirely.</p>
+
+<h2>Primary Login (MFA-Enforced)</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="pri-user" value="grace">
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="pri-pass" value="grace123">
+    </div>
+    <button class="btn btn-primary" onclick="primaryLogin()">Login (Primary)</button>
+</div>
+<div id="pri-result" class="evidence" style="display:none;"></div>
+
+<h2>Legacy API Login (No MFA Check)</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="leg-user" value="grace">
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="leg-pass" value="grace123">
+    </div>
+    <button class="btn btn-danger" onclick="legacyLogin()">Login (Legacy API)</button>
+</div>
+<div id="leg-result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>POST</td><td><code>/lab/auth/auth-01/login</code></td><td>Primary login (enforces MFA)</td></tr>
+    <tr><td>POST</td><td><code>/lab/auth/auth-01/api/v1/login</code></td><td>Legacy API login</td></tr>
+</table>
+
+<script>
+async function primaryLogin() {
+    const res = await fetch('/lab/auth/auth-01/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: document.getElementById('pri-user').value, password: document.getElementById('pri-pass').value})
+    });
+    const data = await res.json();
+    const el = document.getElementById('pri-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+
+async function legacyLogin() {
+    const res = await fetch('/lab/auth/auth-01/api/v1/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: document.getElementById('leg-user').value, password: document.getElementById('leg-pass').value})
+    });
+    const data = await res.json();
+    const el = document.getElementById('leg-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}

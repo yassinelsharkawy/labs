@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Lab 19: Parallel Verification Token Consumption{% endblock %}
+{% block content %}
+<h1>Lab 19: Parallel Verification Token Consumption</h1>
+
+<h2>Scenario</h2>
+<p>An onboarding bonus system awards a $10 credit to users upon redeeming an identity verification token. The redemption routine validates that <code>used == 0</code>, credits the user's wallet, and then sets <code>used = 1</code> in separate non-atomic database commands. In concurrent execution, the single token can be redeemed multiple times before state is committed.</p>
+
+<h2>Objective</h2>
+<p>Simultaneously submit verification requests with the same token to collect multiple onboarding bonuses.</p>
+
+<div class="card">
+    <h3>Redeem Verification Token</h3>
+    <div class="form-group">
+        <label for="token-input">Token</label>
+        <input type="text" id="token-input" value="VERIFY-TOKEN-ALICE-001">
+    </div>
+    <button class="btn btn-primary" onclick="redeemToken()">Redeem Token</button>
+</div>
+<div id="redeem-result" class="evidence" style="display:none;"></div>
+
+<h2>Wallet &amp; Tokens</h2>
+<div id="tokens-summary"></div>
+
+<p><button class="btn btn-secondary" onclick="resetTokens()">Reset Verification Token</button></p>
+
+<script>
+async function loadTokens() {
+    const res = await fetch('/lab/logic/logic-04/tokens');
+    const data = await res.json();
+    const div = document.getElementById('tokens-summary');
+    let html = '<h3>Wallet Balance: $' + (data.wallet ? data.wallet.balance.toFixed(2) : '0.00') + '</h3>';
+    html += '<h3>Active Tokens</h3><table><tr><th>ID</th><th>Token</th><th>Used</th></tr>';
+    data.tokens.forEach(t => {
+        html += `<tr><td>${t.id}</td><td>${t.token}</td><td>${t.used ? 'Yes' : 'No'}</td></tr>`;
+    });
+    html += '</table>';
+    div.innerHTML = html;
+}
+
+async function redeemToken() {
+    const token = document.getElementById('token-input').value;
+    const res = await fetch('/lab/logic/logic-04/verify', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: token})
+    });
+    const data = await res.json();
+    const el = document.getElementById('redeem-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    loadTokens();
+}
+
+async function resetTokens() {
+    await fetch('/lab/logic/logic-04/reset', {method: 'POST'});
+    loadTokens();
+}
+loadTokens();
+</script>
+{% endblock %}

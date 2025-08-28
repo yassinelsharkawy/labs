@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}WebSec Research Labs{% endblock %}
+{% block content %}
+<h1>Web Application Security Research Labs</h1>
+<p>A curriculum featuring 25 original, isolated lab environments derived from vulnerability patterns observed in real-world security research.</p>
+
+{% for cls in classes %}
+<div class="class-section">
+    <div class="class-header">
+        <span class="class-num">Class {{ cls.id }}</span>
+        <h2 style="border:none; margin:0; padding:0;">{{ cls.name }}</h2>
+    </div>
+    <div class="lab-grid">
+    {% for lab in cls.labs %}
+        <div class="lab-item">
+            <span class="lab-num">{{ lab.id }}</span>
+            <div class="lab-title">
+                <a href="{{ url_for('main.index') }}lab/{{ lab.prefix }}/{{ lab.slug }}">{{ lab.title }}</a>
+            </div>
+            <span class="tag tag-{% if cls.id == 1 %}blue{% elif cls.id == 2 %}green{% elif cls.id == 3 %}red{% elif cls.id == 4 %}yellow{% else %}purple{% endif %}">{{ lab.category }}</span>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

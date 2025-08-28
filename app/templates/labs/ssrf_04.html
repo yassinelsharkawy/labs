@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Lab 24: SSRF via Redirect Bypass{% endblock %}
+{% block content %}
+<h1>Lab 24: SSRF via Redirect Bypass of URL Allowlist</h1>
+
+<h2>Scenario</h2>
+<p>A link preview service inspects initial user URLs to block localhost and private subnets. However, the underlying HTTP client automatically follows HTTP 301/302 redirects without validating redirection hops. An attacker can specify a permitted public URL or open redirector that redirects directly to a restricted internal endpoint.</p>
+
+<h2>Objective</h2>
+<p>Provide a URL pointing to the redirection helper (<code>/lab/ssrf/ssrf-04/redirector?target=...</code>) pointing to <code>http://127.0.0.1:5001/internal/metadata</code> to bypass the initial hostname filter.</p>
+
+<div class="card">
+    <div class="form-group">
+        <label for="preview-url">Preview URL</label>
+        <input type="text" id="preview-url" value="http://localhost:5000/lab/ssrf/ssrf-04/redirector?target=http://127.0.0.1:5001/internal/metadata">
+    </div>
+    <button class="btn btn-primary" onclick="fetchPreview()">Fetch Preview</button>
+</div>
+<div id="preview-result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/ssrf/ssrf-04/redirector?target=&lt;url&gt;</code></td><td>HTTP 302 Redirection Helper</td></tr>
+    <tr><td>POST</td><td><code>/lab/ssrf/ssrf-04/fetch-preview</code></td><td>Fetch preview following redirects (JSON: url)</td></tr>
+</table>
+
+<script>
+async function fetchPreview() {
+    const url = document.getElementById('preview-url').value;
+    const res = await fetch('/lab/ssrf/ssrf-04/fetch-preview', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url: url})
+    });
+    const data = await res.json();
+    const el = document.getElementById('preview-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}

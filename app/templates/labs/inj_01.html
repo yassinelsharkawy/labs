@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Lab 11: Stored XSS in Comments{% endblock %}
+{% block content %}
+<h1>Lab 11: Stored XSS in User Comments Rendered in Admin Panel</h1>
+
+<h2>Scenario</h2>
+<p>A platform allows users to post comments on various items. An admin panel renders all comments for moderation. The comment body is stored in the database and rendered in the admin view without output encoding, allowing an attacker to inject JavaScript that executes when an administrator views the comments.</p>
+
+<h2>Objective</h2>
+<p>Post a comment containing a script payload and observe it executing in the admin view.</p>
+
+<h2>Post a Comment</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Comment Body</label>
+        <textarea id="comment-body" rows="3" placeholder="Write a comment..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="postComment()">Submit Comment</button>
+</div>
+<div id="post-result" class="evidence" style="display:none;"></div>
+
+<h2>All Comments (User View — Escaped)</h2>
+<div id="comments-list"></div>
+
+<h2>Admin View (Vulnerable — Unescaped)</h2>
+<p><a href="/lab/injection/inj-01/admin-view" class="btn btn-danger" target="_blank">Open Admin View</a></p>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/injection/inj-01/comments</code></td><td>List all comments (JSON)</td></tr>
+    <tr><td>POST</td><td><code>/lab/injection/inj-01/comments</code></td><td>Post a comment (JSON: body)</td></tr>
+    <tr><td>GET</td><td><code>/lab/injection/inj-01/admin-view</code></td><td>Admin panel rendering comments</td></tr>
+</table>
+
+<script>
+async function loadComments() {
+    const res = await fetch('/lab/injection/inj-01/comments');
+    const data = await res.json();
+    const el = document.getElementById('comments-list');
+    if (!data.length) { el.innerHTML = '<p>No comments yet.</p>'; return; }
+    let html = '<table><tr><th>ID</th><th>User</th><th>Body (escaped)</th></tr>';
+    data.forEach(c => {
+        const safe = c.body.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        html += `<tr><td>${c.id}</td><td>${c.user_id}</td><td>${safe}</td></tr>`;
+    });
+    html += '</table>';
+    el.innerHTML = html;
+}
+
+async function postComment() {
+    const body = document.getElementById('comment-body').value;
+    const res = await fetch('/lab/injection/inj-01/comments', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({body: body})
+    });
+    const data = await res.json();
+    const el = document.getElementById('post-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    loadComments();
+}
+
+loadComments();
+</script>
+{% endblock %}

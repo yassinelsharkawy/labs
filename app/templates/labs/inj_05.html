@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Lab 15: Blind SQL Injection in Audit Log{% endblock %}
+{% block content %}
+<h1>Lab 15: Blind SQL Injection in Audit Log Query</h1>
+
+<h2>Scenario</h2>
+<p>An administrative compliance audit dashboard allows querying system audit logs by filtering on target usernames. The username parameter is interpolated into an internal sub-query (<code>WHERE user_id = (SELECT id FROM users WHERE username = '...')</code>). Because the sub-query allows boolean injections, an attacker can extract arbitrary database secrets through binary search or character inference.</p>
+
+<h2>Objective</h2>
+<p>Exploit the blind boolean SQL injection vulnerability to verify character-by-character extraction of secret data.</p>
+
+<div class="card">
+    <div class="form-group">
+        <label for="username-input">Filter by Username</label>
+        <input type="text" id="username-input" value="admin" placeholder="e.g. admin or admin' AND 1=1 --">
+    </div>
+    <button class="btn btn-primary" onclick="searchAudit()">Filter Audit Records</button>
+</div>
+
+<div id="audit-results" class="card" style="display:none;">
+    <h3>Audit Records</h3>
+    <div id="audit-table"></div>
+</div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/injection/inj-05/audit?username=&lt;username&gt;</code></td><td>Query audit log records</td></tr>
+</table>
+
+<script>
+async function searchAudit() {
+    const username = document.getElementById('username-input').value;
+    const res = await fetch(`/lab/injection/inj-05/audit?username=${encodeURIComponent(username)}`);
+    const data = await res.json();
+    const card = document.getElementById('audit-results');
+    const tableDiv = document.getElementById('audit-table');
+    card.style.display = 'block';
+    if (!data.length) {
+        tableDiv.innerHTML = '<p>No audit records returned (Condition evaluated to False or User not found).</p>';
+        return;
+    }
+    let html = '<table><tr><th>ID</th><th>Action</th><th>Detail</th><th>Created At</th></tr>';
+    data.forEach(r => {
+        html += `<tr><td>${r.id}</td><td>${r.action}</td><td>${r.detail}</td><td>${r.created_at}</td></tr>`;
+    });
+    html += '</table>';
+    tableDiv.innerHTML = html;
+}
+</script>
+{% endblock %}

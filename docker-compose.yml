@@ -1,0 +1,49 @@
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:5000:5000"
+    environment:
+      - HOST=0.0.0.0
+      - SECRET_KEY=lab-secret-key-change-in-production
+      - DB_PATH=/app/data/websec_labs.db
+      - PATCHED_MODE=0
+      - INTERNAL_SERVICE_URL=http://mock-internal:5001
+    volumes:
+      - ./data:/app/data
+    networks:
+      - labnet
+      - default
+    depends_on:
+      - mock-internal
+    restart: unless-stopped
+
+  mock-internal:
+    build: .
+    command: ["python", "mock_service.py"]
+    environment:
+      - HOST=0.0.0.0
+    networks:
+      - labnet
+    restart: unless-stopped
+
+  verifier:
+    build: .
+    command: ["python", "-m", "pytest", "tests/", "-v", "--tb=short"]
+    environment:
+      - PATCHED_MODE=0
+      - TEST_BASE_URL=http://app:5000
+      - INTERNAL_SERVICE_URL=http://mock-internal:5001
+      - DB_PATH=/tmp/test_websec_labs.db
+    networks:
+      - labnet
+      - default
+    depends_on:
+      - app
+      - mock-internal
+    profiles:
+      - test
+
+networks:
+  labnet:
+    internal: true

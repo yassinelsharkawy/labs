@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Lab 18: Invitation Acceptance Exceeding Seat Limit{% endblock %}
+{% block content %}
+<h1>Lab 18: Invitation Acceptance Exceeding Seat Limit</h1>
+
+<h2>Scenario</h2>
+<p>An enterprise team collaboration workspace enforces seat allocation quotas based on licensed tiers. When an invited member accepts an invitation, the system verifies available capacity against <code>max_seats</code> before incrementing <code>used_seats</code>. A Time-of-Check to Time-of-Use (TOCTOU) gap permits multiple pending invitees to accept simultaneously, over-allocating seats beyond the purchased subscription limit.</p>
+
+<h2>Objective</h2>
+<p>Trigger concurrent invitation acceptances to exceed the team seat quota.</p>
+
+<div class="card">
+    <h3>Accept Team Invitation</h3>
+    <div class="form-group">
+        <label for="inv-id">Invitation ID</label>
+        <input type="number" id="inv-id" value="1">
+    </div>
+    <button class="btn btn-primary" onclick="acceptInvite()">Accept Invitation</button>
+</div>
+<div id="invite-result" class="evidence" style="display:none;"></div>
+
+<h2>Team Seats &amp; Invitations</h2>
+<div id="seats-summary"></div>
+
+<p><button class="btn btn-secondary" onclick="resetSeats()">Reset Seats &amp; Invitations</button></p>
+
+<script>
+async function loadSeats() {
+    const res = await fetch('/lab/logic/logic-03/seats');
+    const data = await res.json();
+    const div = document.getElementById('seats-summary');
+    let html = '<h3>Team Quotas</h3><table><tr><th>Team ID</th><th>Max Seats</th><th>Used Seats</th></tr>';
+    data.seats.forEach(s => {
+        html += `<tr><td>${s.team_id}</td><td>${s.max_seats}</td><td><strong>${s.used_seats}</strong></td></tr>`;
+    });
+    html += '</table>';
+    html += '<h3>Pending Invitations</h3><table><tr><th>ID</th><th>Team</th><th>Email</th><th>Accepted</th></tr>';
+    data.invitations.forEach(i => {
+        html += `<tr><td>${i.id}</td><td>${i.team_id}</td><td>${i.email}</td><td>${i.accepted ? 'Yes' : 'No'}</td></tr>`;
+    });
+    html += '</table>';
+    div.innerHTML = html;
+}
+
+async function acceptInvite() {
+    const id = document.getElementById('inv-id').value;
+    const res = await fetch('/lab/logic/logic-03/accept-invite', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({invitation_id: parseInt(id)})
+    });
+    const data = await res.json();
+    const el = document.getElementById('invite-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    loadSeats();
+}
+
+async function resetSeats() {
+    await fetch('/lab/logic/logic-03/reset', {method: 'POST'});
+    loadSeats();
+}
+loadSeats();
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Lab 4: Privilege Escalation via Bulk Role Assignment{% endblock %}
+{% block content %}
+<h1>Lab 4: Privilege Escalation via Bulk Role Assignment</h1>
+
+<h2>Scenario</h2>
+<p>An organization management platform provides a bulk role-update API for administrators to assign roles and permissions to multiple users at once. The endpoint does not verify that the requesting user has admin privileges.</p>
+
+<h2>Objective</h2>
+<p>As a non-admin user, escalate your own privileges by calling the bulk role-update endpoint to grant yourself admin permissions.</p>
+
+<h2>Current Roles</h2>
+<div id="role-list"></div>
+
+<h2>Bulk Role Update</h2>
+<div class="card">
+    <p>Submit a JSON payload to assign roles. Example:</p>
+    <pre>{"updates": [{"user_id": 2, "role_name": "admin", "permissions": "read,write,delete,manage_users"}]}</pre>
+    <div class="form-group">
+        <label>JSON Payload</label>
+        <textarea id="role-payload" rows="4">{"updates": [{"user_id": 2, "role_name": "admin", "permissions": "read,write,delete,manage_users"}]}</textarea>
+    </div>
+    <button class="btn btn-danger" onclick="bulkUpdate()">Submit Bulk Update</button>
+</div>
+<div id="result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/bac/bac-04/roles</code></td><td>List roles in current tenant</td></tr>
+    <tr><td>POST</td><td><code>/lab/bac/bac-04/roles/bulk-update</code></td><td>Bulk update roles (JSON body)</td></tr>
+</table>
+
+<script>
+async function loadRoles() {
+    const res = await fetch('/lab/bac/bac-04/roles');
+    const data = await res.json();
+    const el = document.getElementById('role-list');
+    if (!data.length) { el.innerHTML = '<p>No roles found.</p>'; return; }
+    let html = '<table><tr><th>User ID</th><th>Username</th><th>Role</th><th>Permissions</th></tr>';
+    data.forEach(r => {
+        html += `<tr><td>${r.user_id}</td><td>${r.username}</td><td>${r.role_name}</td><td><code>${r.permissions}</code></td></tr>`;
+    });
+    html += '</table>';
+    el.innerHTML = html;
+}
+
+async function bulkUpdate() {
+    const payload = document.getElementById('role-payload').value;
+    let parsed;
+    try { parsed = JSON.parse(payload); } catch(e) { alert('Invalid JSON'); return; }
+    const res = await fetch('/lab/bac/bac-04/roles/bulk-update', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(parsed)
+    });
+    const data = await res.json();
+    const el = document.getElementById('result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    loadRoles();
+}
+
+loadRoles();
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WebSec Research Labs{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="topnav">
+        <a href="{{ url_for('main.index') }}" class="nav-brand">WebSec Labs</a>
+        <div class="nav-links">
+            <a href="{{ url_for('main.index') }}">Labs</a>
+            <a href="{{ url_for('main.accounts') }}">Test Accounts</a>
+            {% if session.get('username') %}
+                <span class="nav-user">{{ session['username'] }} ({{ session['role'] }}, T{{ session['tenant_id'] }})</span>
+                <a href="{{ url_for('main.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('main.login') }}">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for cat, msg in messages %}
+            <div class="flash flash-{{ cat }}">{{ msg }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="footer">
+        <p>Web Application Security Curriculum &mdash; Local Lab Environment Only</p>
+        <form method="post" action="{{ url_for('main.reset') }}" style="display:inline">
+            <button type="submit" class="btn btn-sm btn-muted" onclick="return confirm('Reset all lab data to initial state?')">Reset Environment</button>
+        </form>
+    </footer>
+</body>
+</html>

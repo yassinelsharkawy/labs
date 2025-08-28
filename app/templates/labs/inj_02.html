@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Lab 12: Reflected XSS via Search Redirect{% endblock %}
+{% block content %}
+<h1>Lab 12: Reflected XSS via Search Redirect Parameter</h1>
+
+<h2>Scenario</h2>
+<p>An e-commerce catalog search endpoint accepts a search query <code>q</code> and an optional post-search redirection URL <code>redirect_to</code>. The value of <code>redirect_to</code> is rendered directly into the <code>href</code> attribute of a "Return to Previous Page" link without protocol validation, permitting pseudo-protocols such as <code>javascript:</code>.</p>
+
+<h2>Objective</h2>
+<p>Inject a <code>javascript:</code> payload via the <code>redirect_to</code> parameter and execute arbitrary script when the link is followed.</p>
+
+<div class="card">
+    <form action="/lab/injection/inj-02/search" method="GET">
+        <div class="form-group">
+            <label for="q">Search Term</label>
+            <input type="text" id="q" name="q" value="Widget" placeholder="Search product catalogue...">
+        </div>
+        <div class="form-group">
+            <label for="redirect_to">Return URL (redirect_to)</label>
+            <input type="text" id="redirect_to" name="redirect_to" value="/lab/injection/inj-02" placeholder="e.g. /products or javascript:alert(1)">
+        </div>
+        <button type="submit" class="btn btn-primary">Execute Search</button>
+    </form>
+</div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/injection/inj-02/search?q=&lt;query&gt;&amp;redirect_to=&lt;url&gt;</code></td><td>Product search with redirect parameter</td></tr>
+</table>
+{% endblock %}

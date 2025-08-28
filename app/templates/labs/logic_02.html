@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Lab 17: Concurrent Duplicate Refund Processing{% endblock %}
+{% block content %}
+<h1>Lab 17: Concurrent Duplicate Refund Processing</h1>
+
+<h2>Scenario</h2>
+<p>A merchant billing service allows customers to request refunds on completed purchases. The refund handler reads the order status, issues a wallet credit, and updates the order status to <code>refunded</code>. Because the database operation does not employ row-level locking or an immediate transaction boundary, concurrent requests can claim multiple refund credits for the same single order.</p>
+
+<h2>Objective</h2>
+<p>Initiate concurrent refund requests against a completed order to double-refund the transaction into your wallet.</p>
+
+<div class="card">
+    <h3>Submit Refund Request</h3>
+    <div class="form-group">
+        <label for="order-id">Completed Order ID</label>
+        <input type="number" id="order-id" value="1">
+    </div>
+    <button class="btn btn-primary" onclick="requestRefund()">Request Refund</button>
+</div>
+<div id="refund-result" class="evidence" style="display:none;"></div>
+
+<h2>Orders &amp; Wallet Status</h2>
+<div id="orders-summary"></div>
+
+<p><button class="btn btn-secondary" onclick="resetRefunds()">Reset Orders &amp; Wallets</button></p>
+
+<script>
+async function loadStatus() {
+    const res = await fetch('/lab/logic/logic-02/orders');
+    const data = await res.json();
+    const div = document.getElementById('orders-summary');
+    let html = '<h3>Orders</h3><table><tr><th>ID</th><th>User</th><th>Amount</th><th>Status</th></tr>';
+    data.orders.forEach(o => {
+        html += `<tr><td>${o.id}</td><td>${o.user_id}</td><td>$${o.amount}</td><td><span class="badge badge-info">${o.status}</span></td></tr>`;
+    });
+    html += '</table>';
+    html += '<h3>Refund Records (' + data.refunds.length + ')</h3>';
+    html += '<h3>Wallet Balances</h3><table><tr><th>User</th><th>Balance</th></tr>';
+    data.wallets.forEach(w => {
+        html += `<tr><td>User ${w.user_id}</td><td>$${w.balance.toFixed(2)}</td></tr>`;
+    });
+    html += '</table>';
+    div.innerHTML = html;
+}
+
+async function requestRefund() {
+    const oid = document.getElementById('order-id').value;
+    const res = await fetch('/lab/logic/logic-02/refund', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({order_id: parseInt(oid)})
+    });
+    const data = await res.json();
+    const el = document.getElementById('refund-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    loadStatus();
+}
+
+async function resetRefunds() {
+    await fetch('/lab/logic/logic-02/reset', {method: 'POST'});
+    loadStatus();
+}
+loadStatus();
+</script>
+{% endblock %}

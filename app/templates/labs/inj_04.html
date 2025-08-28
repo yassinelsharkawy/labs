@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Lab 14: SQL Injection in Product Search{% endblock %}
+{% block content %}
+<h1>Lab 14: SQL Injection in Product Search Filter</h1>
+
+<h2>Scenario</h2>
+<p>An inventory management system provides an endpoint to filter products by category. The category parameter is directly interpolated into a SQL SELECT query via string formatting rather than parameterized placeholders, allowing UNION-based SQL injection to exfiltrate hidden columns such as <code>secret_note</code>.</p>
+
+<h2>Objective</h2>
+<p>Construct a UNION SELECT query payload in the <code>category</code> parameter to extract sensitive internal notes from the database.</p>
+
+<div class="card">
+    <div class="form-group">
+        <label for="category-input">Product Category</label>
+        <input type="text" id="category-input" value="Electronics" placeholder="e.g. Electronics or ' UNION SELECT ...">
+    </div>
+    <button class="btn btn-primary" onclick="searchProducts()">Search Products</button>
+</div>
+
+<div id="results-card" class="card" style="display:none;">
+    <h3>Query Results</h3>
+    <div id="products-table"></div>
+</div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/injection/inj-04/products/search?category=&lt;category&gt;</code></td><td>Filter products by category</td></tr>
+</table>
+
+<script>
+async function searchProducts() {
+    const cat = document.getElementById('category-input').value;
+    const res = await fetch(`/lab/injection/inj-04/products/search?category=${encodeURIComponent(cat)}`);
+    const data = await res.json();
+    const card = document.getElementById('results-card');
+    const tableDiv = document.getElementById('products-table');
+    card.style.display = 'block';
+    if (!data.length) {
+        tableDiv.innerHTML = '<p>No products returned.</p>';
+        return;
+    }
+    let html = '<table><tr><th>ID</th><th>Name</th><th>Category</th><th>Description</th><th>Price</th><th>Stock</th></tr>';
+    data.forEach(p => {
+        html += `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.category}</td><td>${p.description}</td><td>${p.price}</td><td>${p.stock}</td></tr>`;
+    });
+    html += '</table>';
+    tableDiv.innerHTML = html;
+}
+</script>
+{% endblock %}

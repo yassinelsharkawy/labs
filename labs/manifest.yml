@@ -1,0 +1,202 @@
+curriculum:
+  title: "Web Application Security Research Curriculum"
+  description: "A web application security curriculum featuring original, isolated lab environments derived from vulnerability patterns observed in real-world security research."
+  version: "1.0.0"
+  classes_count: 5
+  labs_count: 25
+
+classes:
+  - id: "01-broken-access-control"
+    name: "Broken Access Control and IDOR"
+    labs:
+      - id: "lab-01"
+        number: 1
+        name: "Tenant Isolation Bypass via Insecure Direct Object Reference"
+        route_prefix: "/lab/bac/bac-01"
+        solution_file: "solutions/01-broken-access-control/lab-01.md"
+        difficulty: "Beginner"
+        cwe: "CWE-639"
+      - id: "lab-02"
+        number: 2
+        name: "Insecure Direct Object Reference in Document Deletion"
+        route_prefix: "/lab/bac/bac-02"
+        solution_file: "solutions/01-broken-access-control/lab-02.md"
+        difficulty: "Beginner"
+        cwe: "CWE-639"
+      - id: "lab-03"
+        number: 3
+        name: "Export Endpoint Authorization Bypass"
+        route_prefix: "/lab/bac/bac-03"
+        solution_file: "solutions/01-broken-access-control/lab-03.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-639"
+      - id: "lab-04"
+        number: 4
+        name: "Privilege Escalation via Bulk Role Assignment"
+        route_prefix: "/lab/bac/bac-04"
+        solution_file: "solutions/01-broken-access-control/lab-04.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-269"
+      - id: "lab-05"
+        number: 5
+        name: "Stale Membership Resource Access"
+        route_prefix: "/lab/bac/bac-05"
+        solution_file: "solutions/01-broken-access-control/lab-05.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-285"
+
+  - id: "02-authentication-sessions-mfa"
+    name: "Authentication, Sessions, and MFA"
+    labs:
+      - id: "lab-06"
+        number: 6
+        name: "MFA Enforcement Bypass via Legacy API Endpoint"
+        route_prefix: "/lab/auth/auth-01"
+        solution_file: "solutions/02-authentication-sessions-mfa/lab-06.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-306"
+      - id: "lab-07"
+        number: 7
+        name: "Password Reset Token Reuse After Password Change"
+        route_prefix: "/lab/auth/auth-02"
+        solution_file: "solutions/02-authentication-sessions-mfa/lab-07.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-613"
+      - id: "lab-08"
+        number: 8
+        name: "Session Persistence After Password Change"
+        route_prefix: "/lab/auth/auth-03"
+        solution_file: "solutions/02-authentication-sessions-mfa/lab-08.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-613"
+      - id: "lab-09"
+        number: 9
+        name: "OTP Replay and Non-Consumption"
+        route_prefix: "/lab/auth/auth-04"
+        solution_file: "solutions/02-authentication-sessions-mfa/lab-09.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-287"
+      - id: "lab-10"
+        number: 10
+        name: "OAuth State Parameter Fixation"
+        route_prefix: "/lab/auth/auth-05"
+        solution_file: "solutions/02-authentication-sessions-mfa/lab-10.md"
+        difficulty: "Advanced"
+        cwe: "CWE-352"
+
+  - id: "03-injection"
+    name: "Injection: XSS and SQL Injection"
+    labs:
+      - id: "lab-11"
+        number: 11
+        name: "Stored XSS in User Comments Rendered in Admin Panel"
+        route_prefix: "/lab/injection/inj-01"
+        solution_file: "solutions/03-injection/lab-11.md"
+        difficulty: "Beginner"
+        cwe: "CWE-79"
+      - id: "lab-12"
+        number: 12
+        name: "Reflected XSS via Search Redirect Parameter"
+        route_prefix: "/lab/injection/inj-02"
+        solution_file: "solutions/03-injection/lab-12.md"
+        difficulty: "Beginner"
+        cwe: "CWE-79"
+      - id: "lab-13"
+        number: 13
+        name: "Stored XSS via Wiki Page Markup"
+        route_prefix: "/lab/injection/inj-03"
+        solution_file: "solutions/03-injection/lab-13.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-79"
+      - id: "lab-14"
+        number: 14
+        name: "SQL Injection in Product Search Filter"
+        route_prefix: "/lab/injection/inj-04"
+        solution_file: "solutions/03-injection/lab-14.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-89"
+      - id: "lab-15"
+        number: 15
+        name: "Blind SQL Injection in Audit Log Query"
+        route_prefix: "/lab/injection/inj-05"
+        solution_file: "solutions/03-injection/lab-15.md"
+        difficulty: "Advanced"
+        cwe: "CWE-89"
+
+  - id: "04-business-logic-race-conditions"
+    name: "Business Logic and Race Conditions"
+    labs:
+      - id: "lab-16"
+        number: 16
+        name: "Coupon Code Multiple Redemption"
+        route_prefix: "/lab/logic/logic-01"
+        solution_file: "solutions/04-business-logic-race-conditions/lab-16.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-362"
+      - id: "lab-17"
+        number: 17
+        name: "Concurrent Duplicate Refund Processing"
+        route_prefix: "/lab/logic/logic-02"
+        solution_file: "solutions/04-business-logic-race-conditions/lab-17.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-362"
+      - id: "lab-18"
+        number: 18
+        name: "Invitation Acceptance Exceeding Seat Limit"
+        route_prefix: "/lab/logic/logic-03"
+        solution_file: "solutions/04-business-logic-race-conditions/lab-18.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-362"
+      - id: "lab-19"
+        number: 19
+        name: "Parallel Verification Token Consumption"
+        route_prefix: "/lab/logic/logic-04"
+        solution_file: "solutions/04-business-logic-race-conditions/lab-19.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-362"
+      - id: "lab-20"
+        number: 20
+        name: "Subscription Downgrade State Inconsistency"
+        route_prefix: "/lab/logic/logic-05"
+        solution_file: "solutions/04-business-logic-race-conditions/lab-20.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-840"
+
+  - id: "05-ssrf"
+    name: "Server-Side Request Forgery"
+    labs:
+      - id: "lab-21"
+        number: 21
+        name: "Image Importer SSRF to Internal Metadata"
+        route_prefix: "/lab/ssrf/ssrf-01"
+        solution_file: "solutions/05-ssrf/lab-21.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-918"
+      - id: "lab-22"
+        number: 22
+        name: "Webhook Tester SSRF to Internal Services"
+        route_prefix: "/lab/ssrf/ssrf-02"
+        solution_file: "solutions/05-ssrf/lab-22.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-918"
+      - id: "lab-23"
+        number: 23
+        name: "Report Generator SSRF via Document URL"
+        route_prefix: "/lab/ssrf/ssrf-03"
+        solution_file: "solutions/05-ssrf/lab-23.md"
+        difficulty: "Intermediate"
+        cwe: "CWE-918"
+      - id: "lab-24"
+        number: 24
+        name: "SSRF via Redirect Bypass of URL Allowlist"
+        route_prefix: "/lab/ssrf/ssrf-04"
+        solution_file: "solutions/05-ssrf/lab-24.md"
+        difficulty: "Advanced"
+        cwe: "CWE-918"
+      - id: "lab-25"
+        number: 25
+        name: "SSRF via URL Parsing Inconsistency"
+        route_prefix: "/lab/ssrf/ssrf-05"
+        solution_file: "solutions/05-ssrf/lab-25.md"
+        difficulty: "Advanced"
+        cwe: "CWE-918"

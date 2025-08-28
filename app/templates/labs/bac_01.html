@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Lab 1: Cross-Tenant Invoice Access{% endblock %}
+{% block content %}
+<h1>Lab 1: Cross-Tenant Invoice Access</h1>
+
+<h2>Scenario</h2>
+<p>A multi-tenant invoicing platform allows users to view and download invoices belonging to their organization. Each tenant's data should be isolated. The API endpoint that retrieves a single invoice by its numeric ID does not verify tenant ownership.</p>
+
+<h2>Objective</h2>
+<p>Access invoice records belonging to a different tenant by manipulating the invoice ID parameter.</p>
+
+<h2>Your Invoices</h2>
+<div id="invoice-list"></div>
+
+<h2>Lookup Invoice by ID</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Invoice ID</label>
+        <input type="number" id="invoice-id" min="1" placeholder="e.g. 1">
+    </div>
+    <button class="btn btn-primary" onclick="lookupInvoice()">Fetch Invoice</button>
+</div>
+<div id="result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/bac/bac-01/invoices</code></td><td>List invoices for current tenant</td></tr>
+    <tr><td>GET</td><td><code>/lab/bac/bac-01/invoices/&lt;id&gt;</code></td><td>Get single invoice by ID</td></tr>
+</table>
+
+<script>
+async function loadInvoices() {
+    const res = await fetch('/lab/bac/bac-01/invoices');
+    const data = await res.json();
+    const el = document.getElementById('invoice-list');
+    if (!data.length) { el.innerHTML = '<p>No invoices found. Please log in.</p>'; return; }
+    let html = '<table><tr><th>ID</th><th>Number</th><th>Customer</th><th>Amount</th><th>Status</th></tr>';
+    data.forEach(i => {
+        html += `<tr><td>${i.id}</td><td>${i.invoice_number}</td><td>${i.customer_name}</td><td>$${i.amount}</td><td>${i.status}</td></tr>`;
+    });
+    html += '</table>';
+    el.innerHTML = html;
+}
+
+async function lookupInvoice() {
+    const id = document.getElementById('invoice-id').value;
+    if (!id) return;
+    const res = await fetch(`/lab/bac/bac-01/invoices/${id}`);
+    const data = await res.json();
+    const el = document.getElementById('result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+
+loadInvoices();
+</script>
+{% endblock %}

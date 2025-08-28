@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Lab 13: Stored XSS in Wiki Markup{% endblock %}
+{% block content %}
+<h1>Lab 13: Stored XSS via Wiki Page Markup</h1>
+
+<h2>Scenario</h2>
+<p>An internal wiki allows employees to document project architecture and procedures. Authors can submit HTML and rich markdown notes. When viewed, the page body is rendered using <code>|safe</code> without sanitizing script tags or inline event handlers.</p>
+
+<h2>Objective</h2>
+<p>Update the wiki page with HTML containing executable JavaScript and observe execution upon page retrieval.</p>
+
+<div class="card">
+    <h3>Available Wiki Pages</h3>
+    <ul>
+        <li><a href="/lab/injection/inj-03/wiki/project-overview">Project Overview (slug: project-overview)</a></li>
+    </ul>
+</div>
+
+<div class="card">
+    <h3>Edit Wiki Content</h3>
+    <div class="form-group">
+        <label for="wiki-slug">Page Slug</label>
+        <input type="text" id="wiki-slug" value="project-overview">
+    </div>
+    <div class="form-group">
+        <label for="wiki-body">Wiki Body Markup</label>
+        <textarea id="wiki-body" rows="6">&lt;h2&gt;Project Notes&lt;/h2&gt;&lt;p&gt;Documentation notes go here.&lt;/p&gt;</textarea>
+    </div>
+    <button class="btn btn-primary" onclick="updateWiki()">Save Wiki Page</button>
+</div>
+<div id="wiki-result" class="evidence" style="display:none;"></div>
+
+<script>
+async function updateWiki() {
+    const slug = document.getElementById('wiki-slug').value;
+    const body = document.getElementById('wiki-body').value;
+    const res = await fetch(`/lab/injection/inj-03/wiki/${slug}/edit`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({body: body})
+    });
+    const data = await res.json();
+    const el = document.getElementById('wiki-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}

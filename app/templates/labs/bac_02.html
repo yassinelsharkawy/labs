@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Lab 2: Unauthorized Document Deletion{% endblock %}
+{% block content %}
+<h1>Lab 2: Unauthorized Document Deletion via API</h1>
+
+<h2>Scenario</h2>
+<p>A document management system lets users create, share, and delete documents. The delete API endpoint accepts a document ID but does not verify that the requesting user owns the document.</p>
+
+<h2>Objective</h2>
+<p>Delete a document that belongs to another user by directly calling the API with a different document ID.</p>
+
+<h2>Your Documents</h2>
+<div id="doc-list"></div>
+
+<h2>Delete Document by ID</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Document ID</label>
+        <input type="number" id="doc-id" min="1" placeholder="e.g. 4">
+    </div>
+    <button class="btn btn-danger" onclick="deleteDoc()">Delete Document</button>
+</div>
+<div id="result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/bac/bac-02/documents</code></td><td>List documents you own or can access</td></tr>
+    <tr><td>DELETE</td><td><code>/lab/bac/bac-02/documents/&lt;id&gt;</code></td><td>Delete a document by ID</td></tr>
+</table>
+
+<script>
+async function loadDocs() {
+    const res = await fetch('/lab/bac/bac-02/documents');
+    const data = await res.json();
+    const el = document.getElementById('doc-list');
+    if (!data.length) { el.innerHTML = '<p>No documents found.</p>'; return; }
+    let html = '<table><tr><th>ID</th><th>Title</th><th>Owner ID</th><th>Actions</th></tr>';
+    data.forEach(d => {
+        html += `<tr><td>${d.id}</td><td>${d.title}</td><td>${d.owner_id}</td>
+                  <td><button class="btn btn-sm btn-danger" onclick="deleteDocDirect(${d.id})">Delete</button></td></tr>`;
+    });
+    html += '</table>';
+    el.innerHTML = html;
+}
+
+async function deleteDocDirect(id) {
+    document.getElementById('doc-id').value = id;
+    await deleteDoc();
+}
+
+async function deleteDoc() {
+    const id = document.getElementById('doc-id').value;
+    if (!id) return;
+    const res = await fetch(`/lab/bac/bac-02/documents/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    const el = document.getElementById('result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    loadDocs();
+}
+
+loadDocs();
+</script>
+{% endblock %}

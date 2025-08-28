@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Lab 25: SSRF via URL Parsing Inconsistency{% endblock %}
+{% block content %}
+<h1>Lab 25: SSRF via URL Parsing Inconsistency</h1>
+
+<h2>Scenario</h2>
+<p>An asset fetcher filters destination hostnames by parsing userinfo credentials. Due to a custom parsing error, the filter splits on <code>@</code> and extracts the prefix segment rather than the actual target destination host, allowing an attacker to supply URLs such as <code>http://allowed.example.com@127.0.0.1:5001/internal/metadata</code>.</p>
+
+<h2>Objective</h2>
+<p>Craft a URL with <code>@</code> notation that passes the validation parser and reaches internal services.</p>
+
+<div class="card">
+    <div class="form-group">
+        <label for="res-url">Resource URL</label>
+        <input type="text" id="res-url" value="http://example.com@127.0.0.1:5001/internal/metadata">
+    </div>
+    <button class="btn btn-primary" onclick="fetchResource()">Fetch Resource</button>
+</div>
+<div id="res-result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>POST</td><td><code>/lab/ssrf/ssrf-05/fetch-resource</code></td><td>Fetch resource with parser check (JSON: url)</td></tr>
+</table>
+
+<script>
+async function fetchResource() {
+    const url = document.getElementById('res-url').value;
+    const res = await fetch('/lab/ssrf/ssrf-05/fetch-resource', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url: url})
+    });
+    const data = await res.json();
+    const el = document.getElementById('res-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}

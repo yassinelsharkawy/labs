@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Lab 11: Admin Comments Review{% endblock %}
+{% block content %}
+<h1>Lab 11: Admin Comments Review Panel</h1>
+<p class="badge badge-warning">Admin Moderation Interface</p>
+
+<h2>All User Comments</h2>
+<div class="card">
+    {% if comments %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Author</th>
+                <th>Date</th>
+                <th>Comment Content</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in comments %}
+            <tr>
+                <td>{{ c.id }}</td>
+                <td><strong>{{ c.username }}</strong></td>
+                <td>{{ c.created_at }}</td>
+                <td><div class="comment-body">{{ c.body_html | safe }}</div></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No comments pending moderation.</p>
+    {% endif %}
+</div>
+
+<p><a href="/lab/injection/inj-01" class="btn btn-secondary">Back to Lab Overview</a></p>
+{% endblock %}

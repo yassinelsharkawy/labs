@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Lab 8: Session Persistence After Password Change{% endblock %}
+{% block content %}
+<h1>Lab 8: Session Persistence After Password Change</h1>
+
+<h2>Scenario</h2>
+<p>A web application creates session records when users log in. When a user changes their password, existing sessions for that account should be revoked to prevent continued access from a potentially compromised session. The application fails to invalidate other active sessions.</p>
+
+<h2>Objective</h2>
+<p>Demonstrate that an old session token remains valid after the account's password has been changed.</p>
+
+<h2>Create a Session</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="sess-user" value="alice">
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="sess-pass" value="alice123">
+    </div>
+    <button class="btn btn-primary" onclick="createSession()">Create Session</button>
+</div>
+<div id="sess-result" class="evidence" style="display:none;"></div>
+
+<h2>Change Password</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Current Password</label>
+        <input type="password" id="cur-pass" value="alice123">
+    </div>
+    <div class="form-group">
+        <label>New Password</label>
+        <input type="text" id="chg-pass" value="newpass456">
+    </div>
+    <button class="btn btn-primary" onclick="changePassword()">Change Password</button>
+</div>
+<div id="chg-result" class="evidence" style="display:none;"></div>
+
+<h2>Validate Old Session</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Session Token (from Step 1)</label>
+        <input type="text" id="old-token" placeholder="Paste session token here">
+    </div>
+    <button class="btn btn-danger" onclick="validateSession()">Check Session</button>
+</div>
+<div id="val-result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>POST</td><td><code>/lab/auth/auth-03/login</code></td><td>Create session (JSON: username, password)</td></tr>
+    <tr><td>POST</td><td><code>/lab/auth/auth-03/change-password</code></td><td>Change password (JSON: current_password, new_password)</td></tr>
+    <tr><td>GET</td><td><code>/lab/auth/auth-03/profile?token=...</code></td><td>Validate session token</td></tr>
+</table>
+
+<script>
+async function createSession() {
+    const res = await fetch('/lab/auth/auth-03/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: document.getElementById('sess-user').value, password: document.getElementById('sess-pass').value})
+    });
+    const data = await res.json();
+    const el = document.getElementById('sess-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    if (data.session_token) document.getElementById('old-token').value = data.session_token;
+}
+
+async function changePassword() {
+    const res = await fetch('/lab/auth/auth-03/change-password', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            current_password: document.getElementById('cur-pass').value,
+            new_password: document.getElementById('chg-pass').value
+        })
+    });
+    const data = await res.json();
+    const el = document.getElementById('chg-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+
+async function validateSession() {
+    const token = document.getElementById('old-token').value;
+    const res = await fetch(`/lab/auth/auth-03/profile?token=${encodeURIComponent(token)}`);
+    const data = await res.json();
+    const el = document.getElementById('val-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}

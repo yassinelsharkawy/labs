@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Lab 13: {{ page.title }}{% endblock %}
+{% block content %}
+<h1>{{ page.title }}</h1>
+<p class="badge badge-info">Slug: {{ page.slug }}</p>
+
+<div class="card">
+    <div id="wiki-content">
+        {{ page.body_html | safe }}
+    </div>
+</div>
+
+<p>
+    <a href="/lab/injection/inj-03" class="btn btn-secondary">Back to Wiki Index</a>
+</p>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Lab 20: Subscription Downgrade State Inconsistency{% endblock %}
+{% block content %}
+<h1>Lab 20: Subscription Downgrade State Inconsistency</h1>
+
+<h2>Scenario</h2>
+<p>A SaaS service provides premium tier features to active <code>pro</code> subscribers. When a user requests cancellation, the system marks <code>cancel_requested = 1</code> in one operation and subsequently executes the plan downgrade. However, the premium feature access gate checks only <code>plan == 'pro'</code> rather than validating <code>cancel_requested</code> or performing atomic status revocation, allowing premium features to be accessed in the inconsistent intermediate state.</p>
+
+<h2>Objective</h2>
+<p>Demonstrate state inconsistency by triggering cancellation and exercising premium features during or immediately following cancellation requests.</p>
+
+<div class="card">
+    <h3>Manage Subscription</h3>
+    <div class="form-group">
+        <label for="sub-id">Subscription ID</label>
+        <input type="number" id="sub-id" value="1">
+    </div>
+    <button class="btn btn-danger" onclick="cancelSub()">Cancel Subscription</button>
+    <button class="btn btn-primary" onclick="useFeature()">Access Pro Feature</button>
+</div>
+<div id="sub-result" class="evidence" style="display:none;"></div>
+
+<h2>Current Subscriptions</h2>
+<div id="subs-summary"></div>
+
+<p><button class="btn btn-secondary" onclick="resetSubs()">Reset Subscriptions</button></p>
+
+<script>
+async function loadSubs() {
+    const res = await fetch('/lab/logic/logic-05/subscriptions');
+    const data = await res.json();
+    const div = document.getElementById('subs-summary');
+    let html = '<table><tr><th>ID</th><th>User</th><th>Plan</th><th>Status</th><th>Cancel Requested</th></tr>';
+    data.forEach(s => {
+        html += `<tr><td>${s.id}</td><td>User ${s.user_id}</td><td><span class="badge badge-info">${s.plan}</span></td><td>${s.status}</td><td>${s.cancel_requested ? 'Yes' : 'No'}</td></tr>`;
+    });
+    html += '</table>';
+    div.innerHTML = html;
+}
+
+async function cancelSub() {
+    const sid = document.getElementById('sub-id').value;
+    const res = await fetch('/lab/logic/logic-05/cancel', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({subscription_id: parseInt(sid)})
+    });
+    const data = await res.json();
+    const el = document.getElementById('sub-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    loadSubs();
+}
+
+async function useFeature() {
+    const sid = document.getElementById('sub-id').value;
+    const res = await fetch('/lab/logic/logic-05/use-feature', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({subscription_id: parseInt(sid)})
+    });
+    const data = await res.json();
+    const el = document.getElementById('sub-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    loadSubs();
+}
+
+async function resetSubs() {
+    await fetch('/lab/logic/logic-05/reset', {method: 'POST'});
+    loadSubs();
+}
+loadSubs();
+</script>
+{% endblock %}

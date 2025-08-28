@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Lab 22: Webhook Tester SSRF{% endblock %}
+{% block content %}
+<h1>Lab 22: Webhook Tester SSRF to Internal Services</h1>
+
+<h2>Scenario</h2>
+<p>A notification integrations hub enables developers to configure and test webhook delivery endpoints. When the "Test Webhook" action is triggered, the server issues an HTTP GET request to the target destination and displays the HTTP response status code and body. The validation fails to restrict private or loopback IP ranges.</p>
+
+<h2>Objective</h2>
+<p>Trigger a webhook delivery test targeting the mock internal administrative configuration endpoint (<code>http://127.0.0.1:5001/internal/admin/config</code>) to retrieve sensitive environment variables.</p>
+
+<div class="card">
+    <div class="form-group">
+        <label for="webhook-url">Target Webhook URL</label>
+        <input type="text" id="webhook-url" value="http://127.0.0.1:5001/internal/admin/config" placeholder="https://api.my-domain.com/webhook">
+    </div>
+    <button class="btn btn-primary" onclick="testWebhook()">Send Webhook Test</button>
+</div>
+<div id="webhook-result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>POST</td><td><code>/lab/ssrf/ssrf-02/test-webhook</code></td><td>Test outbound webhook endpoint (JSON: url)</td></tr>
+</table>
+
+<script>
+async function testWebhook() {
+    const url = document.getElementById('webhook-url').value;
+    const res = await fetch('/lab/ssrf/ssrf-02/test-webhook', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url: url})
+    });
+    const data = await res.json();
+    const el = document.getElementById('webhook-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}

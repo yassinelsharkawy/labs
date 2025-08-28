@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Lab 21: Image Importer SSRF{% endblock %}
+{% block content %}
+<h1>Lab 21: Image Importer SSRF to Internal Metadata</h1>
+
+<h2>Scenario</h2>
+<p>A content management profile editor allows users to import avatar or product images by providing a remote image URL. The backend fetches the URL without verifying scheme, host, or resolving IP addresses against private networks. An attacker can supply internal URLs (such as cloud metadata service endpoints or mock internal infrastructure) to extract sensitive credentials.</p>
+
+<h2>Objective</h2>
+<p>Provide an internal URL pointing to the simulated metadata service (<code>http://mock-internal:5001/internal/metadata</code> or <code>http://127.0.0.1:5001/internal/metadata</code>) to exfiltrate cloud credentials.</p>
+
+<div class="card">
+    <div class="form-group">
+        <label for="img-url">Remote Image URL</label>
+        <input type="text" id="img-url" value="http://127.0.0.1:5001/internal/metadata" placeholder="http://example.com/avatar.png">
+    </div>
+    <button class="btn btn-primary" onclick="importImage()">Import Image</button>
+</div>
+<div id="import-result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>POST</td><td><code>/lab/ssrf/ssrf-01/import-image</code></td><td>Import image from URL (JSON: url)</td></tr>
+</table>
+
+<script>
+async function importImage() {
+    const url = document.getElementById('img-url').value;
+    const res = await fetch('/lab/ssrf/ssrf-01/import-image', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url: url})
+    });
+    const data = await res.json();
+    const el = document.getElementById('import-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}

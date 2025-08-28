@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Lab 7: Password Reset Token Reuse{% endblock %}
+{% block content %}
+<h1>Lab 7: Password Reset Token Reuse After Password Change</h1>
+
+<h2>Scenario</h2>
+<p>A password-reset flow issues a one-time token via a request endpoint. The token can be used to set a new password. However, when a user changes their password through another means (e.g., the settings page), previously issued reset tokens are not invalidated.</p>
+
+<h2>Objective</h2>
+<p>Request a password reset token, change the password through a separate mechanism, then use the old token to reset the password again.</p>
+
+<h2>Step 1: Request Reset Token</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="reset-user" value="alice">
+    </div>
+    <button class="btn btn-primary" onclick="requestReset()">Request Reset Token</button>
+</div>
+<div id="reset-result" class="evidence" style="display:none;"></div>
+
+<h2>Step 2: Use Reset Token</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Token</label>
+        <input type="text" id="reset-token" placeholder="Paste token from Step 1">
+    </div>
+    <div class="form-group">
+        <label>New Password</label>
+        <input type="text" id="new-pass" value="hacked123">
+    </div>
+    <button class="btn btn-danger" onclick="useToken()">Reset Password</button>
+</div>
+<div id="use-result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>POST</td><td><code>/lab/auth/auth-02/request-reset</code></td><td>Request reset token (JSON: username)</td></tr>
+    <tr><td>POST</td><td><code>/lab/auth/auth-02/reset</code></td><td>Reset password (JSON: token, new_password)</td></tr>
+</table>
+
+<script>
+async function requestReset() {
+    const res = await fetch('/lab/auth/auth-02/request-reset', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: document.getElementById('reset-user').value})
+    });
+    const data = await res.json();
+    const el = document.getElementById('reset-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    if (data.token) document.getElementById('reset-token').value = data.token;
+}
+
+async function useToken() {
+    const res = await fetch('/lab/auth/auth-02/reset', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            token: document.getElementById('reset-token').value,
+            new_password: document.getElementById('new-pass').value
+        })
+    });
+    const data = await res.json();
+    const el = document.getElementById('use-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}

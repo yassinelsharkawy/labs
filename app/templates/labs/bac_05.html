@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Lab 5: Stale Membership Resource Access{% endblock %}
+{% block content %}
+<h1>Lab 5: Stale Membership Resource Access</h1>
+
+<h2>Scenario</h2>
+<p>A collaboration platform grants access to shared team documents based on team membership records. When a user is removed from a team, the membership record is marked inactive rather than deleted. The document access endpoint checks for the existence of a membership record but not whether it is still active.</p>
+
+<h2>Objective</h2>
+<p>Log in as a user who has been removed from a team (carol, user ID 4, removed from Team 1) and access the team's documents through the API.</p>
+
+<h2>Team Documents</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Team ID</label>
+        <input type="number" id="team-id" value="1" min="1">
+    </div>
+    <button class="btn btn-primary" onclick="loadTeamDocs()">Load Team Documents</button>
+</div>
+<div id="doc-list"></div>
+<div id="result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/bac/bac-05/team/&lt;team_id&gt;/documents</code></td><td>Get documents for a team</td></tr>
+</table>
+
+<h2>Hint</h2>
+<p>User <strong>carol</strong> (ID 4) was previously a member of Team 1 but has been deactivated. Try logging in as carol and accessing Team 1's documents.</p>
+
+<script>
+async function loadTeamDocs() {
+    const tid = document.getElementById('team-id').value;
+    const res = await fetch(`/lab/bac/bac-05/team/${tid}/documents`);
+    const data = await res.json();
+    const el = document.getElementById('result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}

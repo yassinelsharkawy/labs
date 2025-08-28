@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Test Accounts — WebSec Labs{% endblock %}
+{% block content %}
+<h1>Test Accounts</h1>
+<p>Use these pre-seeded accounts to explore the labs. All passwords follow the pattern <code>username + 123</code>.</p>
+<table>
+    <thead><tr><th>Username</th><th>Password</th><th>Role</th><th>Tenant</th><th>Notes</th></tr></thead>
+    <tbody>
+        <tr><td>admin</td><td>admin123</td><td>admin</td><td>1</td><td>Full admin, Tenant 1</td></tr>
+        <tr><td>alice</td><td>alice123</td><td>user</td><td>1</td><td>Regular user, Tenant 1</td></tr>
+        <tr><td>bob</td><td>bob123</td><td>user</td><td>1</td><td>Regular user, Tenant 1</td></tr>
+        <tr><td>carol</td><td>carol123</td><td>manager</td><td>1</td><td>Manager, removed from Team 1</td></tr>
+        <tr><td>dave</td><td>dave123</td><td>user</td><td>2</td><td>Regular user, Tenant 2</td></tr>
+        <tr><td>eve</td><td>eve123</td><td>user</td><td>2</td><td>Regular user, Tenant 2</td></tr>
+        <tr><td>frank</td><td>frank123</td><td>admin</td><td>2</td><td>Admin, Tenant 2</td></tr>
+        <tr><td>grace</td><td>grace123</td><td>user</td><td>1</td><td>MFA enabled, recovery code: RECOVERY-GRACE-001</td></tr>
+        <tr><td>heidi</td><td>heidi123</td><td>user</td><td>1</td><td>Regular user</td></tr>
+        <tr><td>ivan</td><td>ivan123</td><td>user</td><td>1</td><td>Regular user</td></tr>
+    </tbody>
+</table>
+{% endblock %}

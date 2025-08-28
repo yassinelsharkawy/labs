@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Lab 12: Search Results{% endblock %}
+{% block content %}
+<h1>Lab 12: Search Results</h1>
+
+<p>Query: <strong>{{ q }}</strong></p>
+
+{% if redirect_to %}
+<div class="card" style="margin-bottom: 20px;">
+    <p>Return Link: <a id="return-link" href="{{ redirect_to }}">Continue to destination</a></p>
+</div>
+{% endif %}
+
+<h2>Products Matching Query</h2>
+<div class="card">
+    {% if products %}
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th></tr>
+        </thead>
+        <tbody>
+            {% for p in products %}
+            <tr>
+                <td>{{ p.id }}</td>
+                <td>{{ p.name }}</td>
+                <td>{{ p.category }}</td>
+                <td>${{ p.price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No products found matching your search criteria.</p>
+    {% endif %}
+</div>
+
+<p><a href="/lab/injection/inj-02" class="btn btn-secondary">New Search</a></p>
+{% endblock %}

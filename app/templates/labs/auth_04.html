@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Lab 9: OTP Replay and Non-Consumption{% endblock %}
+{% block content %}
+<h1>Lab 9: OTP Replay and Non-Consumption</h1>
+
+<h2>Scenario</h2>
+<p>An application uses one-time passwords (OTPs) for sensitive operations like email verification. The OTP is generated and stored in the database. After successful verification, the token should be marked as consumed. The application fails to mark the OTP as used, allowing it to be replayed.</p>
+
+<h2>Objective</h2>
+<p>Send an OTP, verify it once, then verify it again to demonstrate that the same OTP can be reused multiple times.</p>
+
+<h2>Step 1: Send OTP</h2>
+<div class="card">
+    <button class="btn btn-primary" onclick="sendOTP()">Generate OTP</button>
+    <p class="mt-1">This simulates sending a verification code. The code will be displayed below (in a real system it would be sent via email/SMS).</p>
+</div>
+<div id="otp-result" class="evidence" style="display:none;"></div>
+
+<h2>Step 2: Verify OTP</h2>
+<div class="card">
+    <div class="form-group">
+        <label>OTP Code</label>
+        <input type="text" id="otp-code" placeholder="Enter 6-digit OTP">
+    </div>
+    <button class="btn btn-primary" onclick="verifyOTP()">Verify OTP</button>
+    <button class="btn btn-danger" onclick="verifyOTP()">Replay OTP (use same code again)</button>
+</div>
+<div id="verify-result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>POST</td><td><code>/lab/auth/auth-04/send-otp</code></td><td>Generate and store OTP</td></tr>
+    <tr><td>POST</td><td><code>/lab/auth/auth-04/verify-otp</code></td><td>Verify OTP code (JSON: otp_code)</td></tr>
+</table>
+
+<script>
+async function sendOTP() {
+    const res = await fetch('/lab/auth/auth-04/send-otp', {method: 'POST'});
+    const data = await res.json();
+    const el = document.getElementById('otp-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+    if (data.otp_code) document.getElementById('otp-code').value = data.otp_code;
+}
+
+async function verifyOTP() {
+    const res = await fetch('/lab/auth/auth-04/verify-otp', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({otp_code: document.getElementById('otp-code').value})
+    });
+    const data = await res.json();
+    const el = document.getElementById('verify-result');
+    el.style.display = 'block';
+    el.textContent += JSON.stringify(data, null, 2) + '\n---\n';
+}
+</script>
+{% endblock %}

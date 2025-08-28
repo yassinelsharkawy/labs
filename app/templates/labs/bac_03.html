@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Lab 3: Export Endpoint Authorization Bypass{% endblock %}
+{% block content %}
+<h1>Lab 3: Export Endpoint Authorization Bypass</h1>
+
+<h2>Scenario</h2>
+<p>A platform provides data export functionality. The listing endpoint correctly filters exports by the user's tenant, but the download endpoint retrieves the export file by ID alone without verifying tenant membership.</p>
+
+<h2>Objective</h2>
+<p>Download an export file belonging to another tenant by directly requesting its ID on the download endpoint.</p>
+
+<h2>Your Exports</h2>
+<div id="export-list"></div>
+
+<h2>Download Export by ID</h2>
+<div class="card">
+    <div class="form-group">
+        <label>Export ID</label>
+        <input type="number" id="export-id" min="1" placeholder="e.g. 3">
+    </div>
+    <button class="btn btn-primary" onclick="downloadExport()">Download</button>
+</div>
+<div id="result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>GET</td><td><code>/lab/bac/bac-03/exports</code></td><td>List exports for current tenant</td></tr>
+    <tr><td>GET</td><td><code>/lab/bac/bac-03/exports/&lt;id&gt;/download</code></td><td>Download export by ID</td></tr>
+</table>
+
+<script>
+async function loadExports() {
+    const res = await fetch('/lab/bac/bac-03/exports');
+    const data = await res.json();
+    const el = document.getElementById('export-list');
+    if (!data.length) { el.innerHTML = '<p>No exports found.</p>'; return; }
+    let html = '<table><tr><th>ID</th><th>File Name</th><th>Status</th><th>Actions</th></tr>';
+    data.forEach(e => {
+        html += `<tr><td>${e.id}</td><td>${e.file_name}</td><td>${e.status}</td>
+                  <td><button class="btn btn-sm btn-primary" onclick="downloadDirect(${e.id})">Download</button></td></tr>`;
+    });
+    html += '</table>';
+    el.innerHTML = html;
+}
+
+async function downloadDirect(id) {
+    document.getElementById('export-id').value = id;
+    await downloadExport();
+}
+
+async function downloadExport() {
+    const id = document.getElementById('export-id').value;
+    if (!id) return;
+    const res = await fetch(`/lab/bac/bac-03/exports/${id}/download`);
+    const data = await res.json();
+    const el = document.getElementById('result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+
+loadExports();
+</script>
+{% endblock %}

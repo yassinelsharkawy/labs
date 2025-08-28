@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Lab 23: Report Generator SSRF{% endblock %}
+{% block content %}
+<h1>Lab 23: Report Generator SSRF via Document URL</h1>
+
+<h2>Scenario</h2>
+<p>An analytics dashboard converts external web pages or markdown reports into standardized PDF summaries. Users supply a document source URL, which the backend fetches and formats. The fetch handler performs no origin or network validation.</p>
+
+<h2>Objective</h2>
+<p>Request report generation targeting the internal service health or metadata endpoint to disclose infrastructure metrics.</p>
+
+<div class="card">
+    <div class="form-group">
+        <label for="report-url">Document Source URL</label>
+        <input type="text" id="report-url" value="http://127.0.0.1:5001/internal/health" placeholder="https://reports.partner.com/monthly.html">
+    </div>
+    <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+</div>
+<div id="report-result" class="evidence" style="display:none;"></div>
+
+<h2>API Endpoints</h2>
+<table>
+    <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+    <tr><td>POST</td><td><code>/lab/ssrf/ssrf-03/generate-report</code></td><td>Generate report from source URL (JSON: source_url)</td></tr>
+</table>
+
+<script>
+async function generateReport() {
+    const url = document.getElementById('report-url').value;
+    const res = await fetch('/lab/ssrf/ssrf-03/generate-report', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({source_url: url})
+    });
+    const data = await res.json();
+    const el = document.getElementById('report-result');
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+{% endblock %}
