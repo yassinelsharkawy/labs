@@ -32,8 +32,8 @@ The curriculum is structured into 5 core vulnerability classes, containing 5 ded
 - **Lab 3:** Export Endpoint Authorization Bypass (`CWE-639`)
 - **Lab 4:** Privilege Escalation via Bulk Role Assignment (`CWE-269`)
 - **Lab 5:** Stale Membership Resource Access (`CWE-285`)
-- **Key Concepts:** Multi-tenancy, object ownership matrices, vertical role validation, active status filtering.
-- **Focus:** Emphasize that parameter authentication does not equal authorization. learners frequently conflate valid session state with object permission.
+- **Concepts:** Multi-tenancy, object ownership matrices, vertical role validation, active status filtering.
+- **Key Focus:** Emphasize that parameter authentication does not equal authorization. learners frequently conflate valid session state with object permission.
 
 ### Class 2: Authentication, Sessions, and MFA (Labs 6–10)
 - **Lab 6:** MFA Enforcement Bypass via Legacy API Endpoint (`CWE-306`)
@@ -41,8 +41,8 @@ The curriculum is structured into 5 core vulnerability classes, containing 5 ded
 - **Lab 8:** Session Persistence After Password Change (`CWE-613`)
 - **Lab 9:** OTP Replay and Non-Consumption (`CWE-287`)
 - **Lab 10:** OAuth State Parameter Fixation (`CWE-352`)
-- **Key Concepts:** API parity, session state lifecycle, global invalidation, OTP token consumption, OAuth state fixation.
-- **Focus:** State machines. Walk learners through drawing sequence diagrams for multi-device session management and token lifecycles before examining code.
+- **Concepts:** API parity, session state lifecycle, global invalidation, OTP token consumption, OAuth state fixation.
+- **Key Focus:** State machines. Walk learners through drawing sequence diagrams for multi-device session management and token lifecycles before examining code.
 
 ### Class 3: Injection: Cross-site scripting (XSS) and SQL Injection (Labs 11–15)
 - **Lab 11:** Stored Cross-site scripting (XSS) in User Comments Rendered in Admin Panel (`CWE-79`)
@@ -50,8 +50,8 @@ The curriculum is structured into 5 core vulnerability classes, containing 5 ded
 - **Lab 13:** Stored Cross-site scripting (XSS) via Wiki Page Markup (`CWE-79`)
 - **Lab 14:** SQL Injection in Product Search Filter (`CWE-89`)
 - **Lab 15:** Blind SQL Injection in Audit Log Query (`CWE-89`)
-- **Key Concepts:** Contextual output encoding, URI protocol sanitization, UNION projection, blind boolean subqueries.
-- **Focus:** Input validation vs. context-aware output encoding vs. parameterized queries. Demonstrate why string concatenation fundamentally violates data/instruction separation.
+- **Concepts:** Contextual output encoding, URI protocol sanitization, UNION projection, blind boolean subqueries.
+- **Key Focus:** Input validation vs. context-aware output encoding vs. parameterized queries. Demonstrate why string concatenation fundamentally violates data/instruction separation.
 
 ### Class 4: Business Logic and Race Conditions (Labs 16–20)
 - **Lab 16:** Coupon Code Multiple Redemption (`CWE-362`)
@@ -59,8 +59,8 @@ The curriculum is structured into 5 core vulnerability classes, containing 5 ded
 - **Lab 18:** Invitation Acceptance Exceeding Seat Limit (`CWE-362`)
 - **Lab 19:** Parallel Verification Token Consumption (`CWE-362`)
 - **Lab 20:** Subscription Downgrade State Inconsistency (`CWE-840`)
-- **Key Concepts:** TOCTOU windows, transaction isolation levels (`BEGIN IMMEDIATE`), atomic conditional updates, lifecycle state consistency.
-- **Focus:** Concurrency. learners often struggle to conceptualize race windows. Use concurrent request scripts to demonstrate race windows and parallel collision states.
+- **Concepts:** TOCTOU windows, transaction isolation levels (`BEGIN IMMEDIATE`), atomic conditional updates, lifecycle state consistency.
+- **Key Focus:** Concurrency. learners often struggle to conceptualize race windows. Use concurrent request scripts to demonstrate race windows and parallel collision states.
 
 ### Class 5: Server-Side Request Forgery (Labs 21–25)
 - **Lab 21:** Image Importer SSRF to Internal Metadata (`CWE-918`)
@@ -68,8 +68,8 @@ The curriculum is structured into 5 core vulnerability classes, containing 5 ded
 - **Lab 23:** Report Generator SSRF via Document URL (`CWE-918`)
 - **Lab 24:** SSRF via Redirect Bypass of URL Allowlist (`CWE-918`)
 - **Lab 25:** SSRF via URL Parsing Inconsistency (`CWE-918`)
-- **Key Concepts:** Network egress boundaries, private IP space verification, DNS resolution, redirect validation, parser differential vulnerabilities.
-- **Focus:** Defense-in-depth at network vs. application layers. Clarify why hostname allowlists fail without pre-request IP resolution and hop-by-hop redirect checks.
+- **Concepts:** Network egress boundaries, private IP space verification, DNS resolution, redirect validation, parser differential vulnerabilities.
+- **Key Focus:** Defense-in-depth at network vs. application layers. Clarify why hostname allowlists fail without pre-request IP resolution and hop-by-hop redirect checks.
 
 ---
 
